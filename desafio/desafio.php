@@ -15,7 +15,7 @@
             "usuario2" => [
                 "nome" => "Marcelo",
                 "email" => "mdiament@digitalhouse.com",
-                "senha" => "123456"
+                "senha" => "789123"
             ]
         ];</pre>
 
@@ -30,8 +30,13 @@
             "usuario2" => [
                 "nome" => "Marcelo",
                 "email" => "mdiament@digitalhouse.com",
-                "senha" => "123456"
+                "senha" => "789123"
             ]
         ];
 
+        foreach ($listaDeUsuarios as $usuario => $array) {
+            foreach ($listaDeUsuarios[$usuario] as $categoria => $valor) {
+                echo "Usuário: " . $usuario . " Categoria: " . $categoria . " Valor: " . $valor . "<br>"; 
+            }
+        }
     ?>
