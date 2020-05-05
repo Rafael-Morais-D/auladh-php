@@ -1,3 +1,9 @@
+<?php
+        $usuariosJson = file_get_contents("./data/usuarios.json");
+
+        $arrayUsuarios = json_decode($usuariosJson, true);
+?>
+
 <?php $tituloPagina = "Lista de Usuários"; ?>
 <?php require_once("./inc/head.php"); ?>
 <?php require_once("./inc/header.php"); ?>
@@ -14,11 +20,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <th scope="row">Nome Usuário</th>
-                            <td>E-mail usuário</td>
-                            <td>Senha usuário</td>
-                        </tr>
+                        <?php foreach($arrayUsuarios["usuarios"] as $usuario): ?>
+                            <tr>
+                                <th scope="row"><?= $usuario["nome"] . " " . $usuario["sobrenome"]; ?></th>
+                                <td><?= $usuario["email"]; ?></td>
+                                <td><?= $usuario["senha"]; ?></td>
+                            </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </section>

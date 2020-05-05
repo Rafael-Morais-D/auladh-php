@@ -1,3 +1,29 @@
+<?php
+    if(isset($_POST) && $_POST){
+        $nome = $_POST["nome"];
+        $sobrenome = $_POST["sobrenome"];
+        $email = $_POST["email"];
+        $senha = $_POST["senha"];
+
+        $novoUsuario = [
+            'nome' => $nome, 
+            'sobrenome' => $sobrenome, 
+            'email' => $email, 
+            'senha' => $senha
+        ];
+
+        $usuariosJson = file_get_contents("./data/usuarios.json");
+
+        $arrayUsuarios = json_decode($usuariosJson, true);
+
+        array_push($arrayUsuarios["usuarios"], $novoUsuario);
+
+        $jsonUsuarios = json_encode($arrayUsuarios);
+
+        $cadastrou = file_put_contents("./data/usuarios.json", $jsonUsuarios);
+    }
+?>
+
 <?php $tituloPagina = "Formulário de Cadastro"; ?>
 <?php require_once("./inc/head.php"); ?>
 <?php require_once("./inc/header.php"); ?>
