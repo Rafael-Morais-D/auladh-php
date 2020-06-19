@@ -1,19 +1,23 @@
 <?php
 
+    require_once("./config/conexao.php");
+
+    session_start();
+
+    if(!isset($_SESSION["logado"])){
+        header("Location: login.php");
+    }
+
     if(isset($_GET) && $_GET){
         $id = $_GET["id"];
 
-        $usuariosJson = file_get_contents("./data/usuarios.json");
+        $query = $dbh->prepare('select * from usuarios where id = :id');
 
-        $arrayUsuarios = json_decode($usuariosJson, true);
+        $query->execute([
+            ":id" => $id
+        ]);
 
-        $usuarioEncontrado = [];
-
-        foreach($arrayUsuarios["usuarios"] as $usuario){
-            if($usuario["id"] == $id){
-                array_push($usuarioEncontrado, $usuario);
-            }
-        }
+        $usuarioEncontrado = $query->fetch(PDO::FETCH_ASSOC);
     }
 
     if(isset($_POST) && $_POST){
@@ -24,25 +28,19 @@
         $email = $_POST["email"];
         $senha = $_POST["senha"];
 
-        $usuariosJson = file_get_contents("./data/usuarios.json");
-
-        $arrayUsuarios = json_decode($usuariosJson, true);
-
-        foreach($arrayUsuarios["usuarios"] as $chave => $usuario){
-            if($usuario["id"] == $id){
-                $arrayUsuarios["usuarios"][$chave]["nome"] = $nome;
-                $arrayUsuarios["usuarios"][$chave]["sobrenome"] = $sobrenome;
-                $arrayUsuarios["usuarios"][$chave]["email"] = $email;
-
-                if($senha != ""){
-                    $arrayUsuarios["usuarios"][$chave]["senha"] = $senha;
-                }
-            }
+        if($senha != ""){
+            $senha = password_hash($senha, PASSWORD_DEFAULT);
         }
 
-        $jsonUsuarios = json_encode($arrayUsuarios);
+        $query = $dbh->prepare('update usuarios set nome = :nome, sobrenome = :sobrenome, email = :email, senha = :senha where id = :id');
 
-        $alterou = file_put_contents("./data/usuarios.json", $jsonUsuarios);
+        $alterou = $query->execute([
+            ":nome" => $nome,
+            ":sobrenome" => $sobrenome,
+            ":email" => $email,
+            ":senha" => $senha,
+            ":id" => $id
+        ]);
     }
 ?>
 
@@ -65,7 +63,7 @@
                                 e o usuario fez uma alteracao, portanto, iremos listar a informacao obtida atraves do envio do formulario
                                 para conseguir exibir o valor que o usuario altera no campo nome apos clicar no botao Editar
                             -->
-                            <input type="text" class="form-control" id="nome" name="nome" value="<?= isset($_GET["id"]) ? $usuarioEncontrado[0]["nome"] : $_POST["nome"] ?>" required>
+                            <input type="text" class="form-control" id="nome" name="nome" value="<?= isset($_GET["id"]) ? $usuarioEncontrado["nome"] : $_POST["nome"] ?>" required>
                         </div>
                         <div class="form-group col-md-6">
                             <label for="sobrenome">Sobrenome</label>
@@ -75,7 +73,7 @@
                                 e o usuario fez uma alteracao, portanto, iremos listar a informacao obtida atraves do envio do formulario
                                 para conseguir exibir o valor que o usuario altera no campo sobrenome apos clicar no botao Editar
                             -->
-                            <input type="text" class="form-control" id="sobrenome" name="sobrenome" value="<?= isset($_GET["id"]) ? $usuarioEncontrado[0]["sobrenome"] : $_POST["sobrenome"] ?>" required>
+                            <input type="text" class="form-control" id="sobrenome" name="sobrenome" value="<?= isset($_GET["id"]) ? $usuarioEncontrado["sobrenome"] : $_POST["sobrenome"] ?>" required>
                         </div>
                     </div>
                     <div class="form-row">
@@ -87,7 +85,7 @@
                                 e o usuario fez uma alteracao, portanto, iremos listar a informacao obtida atraves do envio do formulario
                                 para conseguir exibir o valor que o usuario altera no campo email apos clicar no botao Editar
                             -->
-                            <input type="email" class="form-control" id="email" name="email" value="<?= isset($_GET["id"]) ? $usuarioEncontrado[0]["email"] : $_POST["email"] ?>" required>
+                            <input type="email" class="form-control" id="email" name="email" value="<?= isset($_GET["id"]) ? $usuarioEncontrado["email"] : $_POST["email"] ?>" required>
                         </div>
                         <div class="form-group col-md-6">
                             <label for="senha">Senha</label>                                             
